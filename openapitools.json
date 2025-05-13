@@ -1,0 +1,10 @@
+{
+   "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+   "spaces": 2,
+   "generator-cli": {
+      "version": "7.13.0",
+      "repository": {
+         "downloadUrl": "http://maven-test:password@localhost:8081/repository/maven-public/${groupId}/${artifactId}/${versionName}/${artifactId}-${versionName}.jar"
+      }
+   }
+}
