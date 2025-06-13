@@ -6,19 +6,29 @@ const specDir = path.resolve(__dirname, 'api-specs'); // Base directory for Swag
 const outputBaseDir = path.resolve(__dirname, 'api-services'); // Output directory
 const openApiGenerator = 'openapi-generator-cli'; // CLI for OpenAPI generator
 
-function replaceDownloadUrl(filePath, url) {
+function replaceDownloadUrl(filePath, newUrl) {
    if (!fs.existsSync(filePath)) {
       console.error('❌ File not found:', filePath);
       return;
    }
 
    try {
-      const data = fs.readFileSync(filePath, 'utf8');
-      const updated = data.replace(/\$\{downloadUrl\}/g, url);
-      fs.writeFileSync(filePath, updated, 'utf8');
-      console.log('✅ Replaced ${downloadUrl} successfully.');
+      const raw = fs.readFileSync(filePath, 'utf8');
+      const json = JSON.parse(raw);
+
+      // Safely access and update
+      if (json['generator-cli']?.repository) {
+         json['generator-cli'].repository.downloadUrl = newUrl;
+      } else {
+         console.warn('⚠️ Path not found in JSON: generator-cli.repository');
+         return;
+      }
+
+      // Re-write JSON with spacing
+      fs.writeFileSync(filePath, JSON.stringify(json, null, json.spaces || 2), 'utf8');
+      console.log('✅ JSON downloadUrl updated successfully.');
    } catch (err) {
-      console.error('❌ Error processing file:', err);
+      console.error('❌ Error updating JSON:', err);
    }
 }
 
@@ -61,12 +71,6 @@ function generateServices() {
       process.exit(0); // Exit gracefully if no Swagger files are found
    }
 
-   // Set custom Maven repository URL
-   // maven-test:password
-   const file = path.join('D:', 'openapi-test', 'openapitools.json');
-   const downloadUrl = `http://${process.env.MAVEN_USERNAME}:${process.env.MAVEN_PASSWORD}@localhost:8081/repository/maven-public/\${groupId}/\${artifactId}/\${versionName}/\${artifactId}-\${versionName}.jar`;
-   replaceDownloadUrl(file, downloadUrl);
-
    swaggerFiles.forEach((specPath) => {
       // Read the Swagger file
       const relativePath = path.relative(specDir, specPath); // Maintain subdirectory structure
@@ -97,4 +101,9 @@ function generateServices() {
    });
 }
 
+// Create download url at runtime
+const file = path.join(__dirname, 'openapitools.json');
+const downloadUrl = `http://${process.env.MAVEN_USERNAME}:${process.env.MAVEN_PASSWORD}@localhost:8081/repository/maven-public/\${groupId}/\${artifactId}/\${versionName}/\${artifactId}-\${versionName}.jar`;
+replaceDownloadUrl(file, downloadUrl);
 generateServices();
+replaceDownloadUrl(file, '');

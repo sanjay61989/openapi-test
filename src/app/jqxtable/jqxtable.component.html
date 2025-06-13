@@ -1,0 +1,17 @@
+<div style="margin: 10px">
+   <h1 class="title">Angular Dynamic Component Loader</h1>
+   <jqxGrid
+      #grid
+      [width]="'99%'"
+      [source]="dataAdapter"
+      [columns]="columns"
+      [sortable]="true"
+      [pageable]="false"
+      [autoheight]="true"
+      [columnsresize]="true"
+      [scrollmode]="'logical'"
+      [selectionmode]="'none'"
+   >
+   </jqxGrid>
+   {{ clickMessage }}
+</div>
