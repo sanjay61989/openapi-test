@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { jqxDomService } from './jqx-dom.service';
 import { jqxGridComponent } from 'jqwidgets-ng/jqxgrid';
-
+import { jqxButtonComponent } from 'jqwidgets-ng/jqxbuttons';
 export interface Hero {
    id: number;
    name: string;
@@ -56,31 +56,41 @@ export class JqxtableComponent {
          {
             text: 'Name',
             datafield: 'name',
+            width: 80,
          },
          {
             text: 'Action',
             datafield: 'action', // <-- no need to exist in the data, just a dummy field
-            width: 80,
+
             sortable: false,
             filterable: false,
             createwidget: (row: any, column: any, value: string, htmlElement: HTMLElement): void => {
-               const button = document.createElement('button');
-               button.className = 'material-icons';
-               button.innerText = 'edit';
-               button.title = 'Edit Row';
+               // const button = document.createElement('button');
+               // button.className = 'material-icons';
+               // button.innerText = 'edit';
+               // button.title = 'Edit Row';
 
-               button.style.border = 'none';
-               button.style.background = 'transparent';
-               button.style.cursor = 'pointer';
-               button.style.fontSize = '20px';
-               button.style.width = '100%';
-               button.style.height = '100%';
+               // button.style.border = 'none';
+               // button.style.background = 'transparent';
+               // button.style.cursor = 'pointer';
+               // button.style.fontSize = '20px';
+               // button.style.width = '100%';
+               // button.style.height = '100%';
 
-               button.onclick = () => {
-                  this.onClickMe(row);
-               };
+               // button.onclick = () => {
+               //    this.onClickMe(row);
+               // };
 
-               htmlElement.appendChild(button);
+               // htmlElement.appendChild(button);
+               const that = this;
+               let container = document.createElement('div');
+               htmlElement.appendChild(container);
+               let result = this.jqxDomService.loadComponent(jqxButtonComponent, container);
+               (<jqxButtonComponent>result.componentRef.instance).autoCreate = false;
+               (<jqxButtonComponent>result.componentRef.instance).onClick.subscribe((clickEvent: any, value: any) => {
+                  that.onClickMe(row);
+               });
+               (<jqxButtonComponent>result.componentRef.instance).createComponent({ value: 'Edit', width: 100 });
             },
             initwidget: (row: any, column: any, value: string, htmlElement: HTMLElement): void => {},
          },
